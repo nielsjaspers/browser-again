@@ -3,3 +3,8 @@
 button { border-radius: .35rem; overflow-wrap: anywhere; }
 [hidden], #detail:empty, #error:empty { display: none !important; }
 #error { font-size: .9rem; }
+
+.breath { display: none; width: 6rem; height: 6rem; margin: 1.5rem 0; place-items: center; }
+body[data-phase="breathing"] .breath { display: grid; }
+#orb { width: 100%; height: 100%; border-radius: 50%; background: currentColor; opacity: .65; transform: scale(.45); }
+@media (prefers-reduced-motion: reduce) { #orb { transform: scale(.7) !important; } }

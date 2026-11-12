@@ -5,6 +5,14 @@ const proceed = document.querySelector("#continue");
 const emergency = document.querySelector("#emergency");
 const retry = document.querySelector("#retry");
 const error = document.querySelector("#error");
+const orb = document.querySelector("#orb");
+let breathAnimation;
+let breathDeadline;
+function stopBreathing() {
+  breathAnimation?.cancel();
+  breathAnimation = undefined;
+  breathDeadline = undefined;
+}
 let timer;
 let busy = false;
 let refreshPending = false;
@@ -31,6 +39,7 @@ function draw(state) {
   proceed.hidden = true;
   const remaining = activePass ? 0 : state.readyAt - Date.now();
   if (remaining <= 0) {
+    stopBreathing();
     document.body.dataset.phase = "choice";
     heading.textContent = `Open ${label}?`;
     detail.textContent = activePass ? "Continue within your current session. Its deadline stays the same." : "You’ll have 5 minutes.";
@@ -41,6 +50,16 @@ function draw(state) {
   document.body.dataset.phase = "breathing";
   heading.textContent = "Take a slow breath.";
   detail.textContent = "";
+  if (breathDeadline !== state.readyAt) {
+    stopBreathing();
+    breathAnimation = orb.animate([
+      { transform: "scale(.45)", easing: "ease-in-out" },
+      { transform: "scale(1)", offset: 3 / 7, easing: "ease-in-out" },
+      { transform: "scale(.45)" }
+    ], { duration: 7_000, fill: "both" });
+    breathAnimation.currentTime = Math.max(0, 7_000 - remaining);
+    breathDeadline = state.readyAt;
+  }
   timer = setTimeout(() => draw(state), remaining);
 }
 async function act(action) {
@@ -55,6 +74,7 @@ async function act(action) {
     if (!response.policy) {
       if (action === "open") { leaving = true; location.replace(url); return; }
       clearTimeout(timer);
+      stopBreathing();
       document.body.dataset.phase = "choice";
       heading.textContent = "This site is unblocked.";
       detail.textContent = "You can open it without a time limit.";
