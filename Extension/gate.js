@@ -53,9 +53,9 @@ function draw(state) {
   if (breathDeadline !== state.readyAt) {
     stopBreathing();
     breathAnimation = orb.animate([
-      { transform: "scale(.45)", easing: "ease-in-out" },
+      { transform: "scale(.08)", easing: "ease-in-out" },
       { transform: "scale(1)", offset: 3 / 7, easing: "ease-in-out" },
-      { transform: "scale(.45)" }
+      { transform: "scale(.08)" }
     ], { duration: 7_000, fill: "both" });
     breathAnimation.currentTime = Math.max(0, 7_000 - remaining);
     breathDeadline = state.readyAt;
