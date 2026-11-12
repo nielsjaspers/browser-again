@@ -1,22 +1,5 @@
-:root { font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #f6f3e9; background: #163b3b; }
-* { box-sizing: border-box; }
-body { margin: 0; min-height: 100svh; background: #163b3b; transition: background 1s, color 1s; }
-main { position: relative; z-index: 1; min-height: 100svh; width: min(100%, 34rem); margin: 0 auto; padding: max(2rem, env(safe-area-inset-top)) 1.5rem max(2rem, env(safe-area-inset-bottom)); display: flex; flex-direction: column; }
-.site { margin: 0; text-align: center; font-size: .85rem; letter-spacing: .04em; overflow-wrap: anywhere; opacity: .8; }
-.message { margin: auto 0; padding: 3rem 0; text-align: center; }
-.eyebrow { font-size: .85rem; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
-h1 { font-size: clamp(2.75rem, 10vw, 4.5rem); letter-spacing: -.045em; line-height: 1.06; font-weight: 620; margin: 1rem 0; }
-#detail { line-height: 1.5; font-size: 1.05rem; opacity: .85; min-height: 1.6em; }
-.breath-field { position: fixed; inset: auto 0 0; height: var(--fill, 0%); border-radius: 45% 45% 0 0 / 10vh 10vh 0 0; background: linear-gradient(160deg, #23514b, #20454f 65%, #183d54); transition: height .15s linear, opacity 1s; }
-.actions { display: grid; gap: .65rem; }
-button { font: inherit; font-size: 1rem; font-weight: 600; min-height: 52px; width: 100%; padding: 1rem 1.25rem; border-radius: 2rem; border: 1px solid #f6f3e970; color: inherit; background: transparent; cursor: pointer; overflow-wrap: anywhere; }
-button:focus-visible { outline: 3px solid #e2b655; outline-offset: 4px; }
-button:disabled { opacity: .45; cursor: default; }
-button.continue { border-color: transparent; }
-button.emergency { font-size: .85rem; min-height: 44px; padding: .75rem 1rem; border-color: transparent; opacity: .8; }
-[hidden] { display: none !important; }
-#error { margin: .25rem 0 0; font-size: .85rem; line-height: 1.4; text-align: center; }
-body[data-phase="choice"] { background: #f1ecdf; color: #163b3b; }
-body[data-phase="choice"] .breath-field { opacity: 0; }
-body[data-phase="choice"] #close { color: #f6f3e9; background: #163b3b; border-color: #163b3b; }
-@media (prefers-reduced-motion: reduce) { body, .breath-field { transition: none; } .breath-field { height: 100% !important; opacity: .25; } }
+.actions { max-width: 22rem; }
+#heading { overflow-wrap: anywhere; }
+button { border-radius: .35rem; overflow-wrap: anywhere; }
+[hidden], #detail:empty, #error:empty { display: none !important; }
+#error { font-size: .9rem; }

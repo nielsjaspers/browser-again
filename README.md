@@ -8,7 +8,7 @@ New Nitter domains are detected from their hostname or standard Nitter page meta
 
 ## Timed access
 
-YouTube and custom sites set to timed access start with a ten-second breathing animation. After breathing, choose Continue for five minutes of access, or Close this tab to leave. The extension does not automatically open the site when the animation ends.
+YouTube and custom sites set to timed access start with a seven-second static breathing prompt. After breathing, choose Continue for five minutes of access, or Close this tab to leave. The extension does not automatically open the site when the pause ends.
 
 When the five minutes expire, the access screen returns. Emergency appears only after the first completed access cycle and grants five more minutes without repeating the breathing exercise. It does not extend a currently active pass. Closing the access screen ends that site’s session. Closing all associated tabs, or navigating those tabs away from the site, also requires a fresh breathing cycle next time. Each site has its own session; tabs for the same site share one deadline.
 

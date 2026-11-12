@@ -20,7 +20,7 @@ function room(initial: Record<string, State> = {}) {
   async function createGate(id: number) {
     const events = new Map<string, () => void>();
     const elements = new Map<string, { textContent: string; hidden: boolean; disabled: boolean; addEventListener: (event: string, fn: () => void) => void }>();
-    for (const name of ["site", "eyebrow", "heading", "detail", "close", "continue", "emergency", "error", "retry"]) {
+    for (const name of ["heading", "detail", "close", "continue", "emergency", "error", "retry"]) {
       elements.set(name, { textContent: "", hidden: false, disabled: false, addEventListener: (_event, fn) => events.set(name, fn) });
     }
     let timer = () => {};
@@ -44,13 +44,27 @@ function room(initial: Record<string, State> = {}) {
   const settle = async () => { for (let i = 0; i < 200; i++) await Promise.resolve(); };
   return { session, createGate, settle, advance: (ms: number) => { now += ms; }, writes: () => writes, removePolicy: () => { policy = null; listeners.forEach(listener => listener({ customSites: {} }, "local")); } };
 }
+test("a static breath prompt waits seven seconds before offering an explicit choice", async () => {
+  const f = room();
+  const gate = await f.createGate(1); await f.settle();
+  expect(gate.elements.get("heading")?.textContent).toBe("Take a slow breath.");
+  expect(gate.elements.get("continue")?.hidden).toBe(true);
+  expect(gate.elements.get("emergency")?.hidden).toBe(true);
+  f.advance(6_999); gate.tick();
+  expect(gate.elements.get("heading")?.textContent).toBe("Take a slow breath.");
+  expect(gate.elements.get("continue")?.hidden).toBe(true);
+  f.advance(1); gate.tick();
+  expect(gate.elements.get("heading")?.textContent).toBe("Open YouTube?");
+  expect(gate.elements.get("continue")?.hidden).toBe(false);
+  expect(gate.redirects).toEqual([]);
+});
 test("an access screen recovers after another tab resets the session", async () => {
   const f = room({ youtube: { readyAt: 0, expiresAt: 0, cycle: 1, tabs: [1, 2], gateTabs: [1, 2] } });
   const gate = await f.createGate(1); await f.settle();
   expect(gate.elements.get("emergency")?.hidden).toBe(false);
   await f.session.removeTab(2); await f.settle();
   expect(gate.elements.get("emergency")?.hidden).toBe(true);
-  expect(gate.body.dataset.phase).toBe("inhale");
+  expect(gate.body.dataset.phase).toBe("breathing");
   f.advance(BREATH_MS); gate.tick();
   expect(gate.body.dataset.phase).toBe("choice");
   gate.events.get("continue")?.(); await f.settle();
