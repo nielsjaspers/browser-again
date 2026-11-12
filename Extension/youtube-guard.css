@@ -1,0 +1,2 @@
+/* Hide YouTube until the shared pass has been checked. */
+html { visibility: hidden !important; }

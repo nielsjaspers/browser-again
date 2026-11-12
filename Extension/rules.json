@@ -1,0 +1,84 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked.html"
+      }
+    },
+    "condition": {
+      "requestDomains": [
+        "news.ycombinator.com",
+        "x.com",
+        "twitter.com",
+        "nitter.net",
+        "xcancel.com",
+        "twiiit.com",
+        "nitter.poast.org",
+        "nitter.privacyredirect.com",
+        "nitter.tiekoetter.com",
+        "nuku.trabun.org",
+        "nitter.catsarch.com",
+        "nitter.kareem.one",
+        "nitter.privacydev.net",
+        "nitter.space"
+      ],
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "news.ycombinator.com",
+        "x.com",
+        "twitter.com",
+        "nitter.net",
+        "xcancel.com",
+        "twiiit.com",
+        "nitter.poast.org",
+        "nitter.privacyredirect.com",
+        "nitter.tiekoetter.com",
+        "nuku.trabun.org",
+        "nitter.catsarch.com",
+        "nitter.kareem.one",
+        "nitter.privacydev.net",
+        "nitter.space"
+      ],
+      "resourceTypes": [
+        "sub_frame",
+        "media",
+        "xmlhttprequest",
+        "script",
+        "image",
+        "ping",
+        "websocket",
+        "other"
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/blocked.html"
+      }
+    },
+    "condition": {
+      "regexFilter": "^https?://([^/]+\\.)?nitter([.-][a-z0-9-]+)*\\.[a-z]+(:[0-9]+)?/",
+      "resourceTypes": [
+        "main_frame"
+      ]
+    }
+  }
+]

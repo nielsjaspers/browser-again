@@ -1,0 +1,338 @@
+{
+  "default-configuration": "Release",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "localizations": {
+    "development": "en",
+    "supported": [
+      "Base"
+    ]
+  },
+  "files": [
+    {
+      "kind": "group",
+      "path": "Browser Again",
+      "children": [
+        {
+          "path": "AppDelegate.swift",
+          "target-membership": [
+            "Browser Again/compile-sources"
+          ]
+        },
+        {
+          "path": "SceneDelegate.swift",
+          "target-membership": [
+            "Browser Again/compile-sources"
+          ]
+        },
+        {
+          "path": "ViewController.swift",
+          "target-membership": [
+            "Browser Again/compile-sources"
+          ]
+        },
+        {
+          "kind": "variant-group",
+          "name": "LaunchScreen.storyboard",
+          "target-membership": [
+            "Browser Again/resources"
+          ],
+          "children": [
+            {
+              "path": "Base.lproj/LaunchScreen.storyboard"
+            }
+          ]
+        },
+        {
+          "path": "Assets.xcassets",
+          "target-membership": [
+            "Browser Again/resources"
+          ]
+        },
+        {
+          "path": "Info.plist"
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "path": "Browser Again Extension",
+      "children": [
+        {
+          "kind": "group",
+          "path": "<PROJECT>/Browser Again Extension",
+          "name": "Resources",
+          "children": [
+            {
+              "path": "../../Extension/rules.json",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/manifest.json",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/detect-nitter.js",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/blocked.html",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/hosts.json",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/blocked.css",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/session.js",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/background.js",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/youtube-guard.js",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/youtube-guard.css",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/youtube.html",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            },
+            {
+              "path": "../../Extension/youtube.js",
+              "target-membership": [
+                "Browser Again Extension/resources"
+              ]
+            }
+          ]
+        },
+        {
+          "path": "SafariWebExtensionHandler.swift",
+          "target-membership": [
+            "Browser Again Extension/compile-sources"
+          ]
+        },
+        {
+          "path": "Info.plist"
+        }
+      ]
+    },
+    {
+      "kind": "group",
+      "name": "Products",
+      "children": [
+        {
+          "path": "<PRODUCTS>/Browser Again.app",
+          "id": "B89271DF30A5F8D80050D5AF",
+          "type": "wrapper.application",
+          "index": false
+        },
+        {
+          "path": "<PRODUCTS>/Browser Again Extension.appex",
+          "id": "B89271FC30A5F8D90050D5AF",
+          "type": "wrapper.app-extension",
+          "index": false,
+          "target-membership": [
+            {
+              "build-phase": "Browser Again/copy/Embed Foundation Extensions",
+              "header-preservation": "remove-on-copy"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "targets": [
+    {
+      "name": "Browser Again",
+      "id": "B89271DE30A5F8D80050D5AF",
+      "product": "Products/Browser Again.app",
+      "product-type": "application",
+      "dependencies": [
+        "Browser Again Extension"
+      ],
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources",
+        {
+          "kind": "copy",
+          "name": "Embed Foundation Extensions",
+          "bundle-base-path": "plugins-directory"
+        }
+      ],
+      "build-settings": {
+        "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
+        "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor",
+        "CODE_SIGN_STYLE": "Automatic",
+        "CURRENT_PROJECT_VERSION": "2",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "INFOPLIST_FILE": "Browser Again/Info.plist",
+        "INFOPLIST_KEY_CFBundleDisplayName": "Browser Again",
+        "INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents": "YES",
+        "INFOPLIST_KEY_UILaunchStoryboardName": "LaunchScreen",
+        "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
+        "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
+        "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks"
+        ],
+        "MARKETING_VERSION": "1.1",
+        "OTHER_LDFLAGS": [
+          "-framework",
+          "SafariServices",
+          "-framework",
+          "WebKit"
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "org.browseragain.app",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
+        "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
+        "SWIFT_DEFAULT_ACTOR_ISOLATION": "MainActor",
+        "SWIFT_EMIT_LOC_STRINGS": "YES",
+        "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
+        "SWIFT_VERSION": "5.0",
+        "TARGETED_DEVICE_FAMILY": "1,2"
+      }
+    },
+    {
+      "name": "Browser Again Extension",
+      "id": "B89271FB30A5F8D90050D5AF",
+      "product": "Products/Browser Again Extension.appex",
+      "product-type": "app-extension",
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources"
+      ],
+      "build-settings": {
+        "CODE_SIGN_STYLE": "Automatic",
+        "CURRENT_PROJECT_VERSION": "2",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "INFOPLIST_FILE": "Browser Again Extension/Info.plist",
+        "INFOPLIST_KEY_CFBundleDisplayName": "Browser Again Extension",
+        "INFOPLIST_KEY_NSHumanReadableCopyright": "",
+        "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+          "@executable_path/../../Frameworks"
+        ],
+        "MARKETING_VERSION": "1.1",
+        "OTHER_LDFLAGS": [
+          "-framework",
+          "SafariServices"
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "org.browseragain.app.Extension",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "SKIP_INSTALL": "YES",
+        "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
+        "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
+        "SWIFT_EMIT_LOC_STRINGS": "YES",
+        "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
+        "SWIFT_VERSION": "5.0",
+        "TARGETED_DEVICE_FAMILY": "1,2"
+      }
+    }
+  ],
+  "build-settings": {
+    "ALWAYS_SEARCH_USER_PATHS": "NO",
+    "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS": "YES",
+    "CLANG_ANALYZER_NONNULL": "YES",
+    "CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION": "YES_AGGRESSIVE",
+    "CLANG_CXX_LANGUAGE_STANDARD": "gnu++20",
+    "CLANG_ENABLE_MODULES": "YES",
+    "CLANG_ENABLE_OBJC_ARC": "YES",
+    "CLANG_ENABLE_OBJC_WEAK": "YES",
+    "CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING": "YES",
+    "CLANG_WARN_BOOL_CONVERSION": "YES",
+    "CLANG_WARN_COMMA": "YES",
+    "CLANG_WARN_CONSTANT_CONVERSION": "YES",
+    "CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS": "YES",
+    "CLANG_WARN_DIRECT_OBJC_ISA_USAGE": "YES_ERROR",
+    "CLANG_WARN_DOCUMENTATION_COMMENTS": "YES",
+    "CLANG_WARN_EMPTY_BODY": "YES",
+    "CLANG_WARN_ENUM_CONVERSION": "YES",
+    "CLANG_WARN_INFINITE_RECURSION": "YES",
+    "CLANG_WARN_INT_CONVERSION": "YES",
+    "CLANG_WARN_NON_LITERAL_NULL_CONVERSION": "YES",
+    "CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF": "YES",
+    "CLANG_WARN_OBJC_LITERAL_CONVERSION": "YES",
+    "CLANG_WARN_OBJC_ROOT_CLASS": "YES_ERROR",
+    "CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER": "YES",
+    "CLANG_WARN_RANGE_LOOP_ANALYSIS": "YES",
+    "CLANG_WARN_STRICT_PROTOTYPES": "YES",
+    "CLANG_WARN_SUSPICIOUS_MOVE": "YES",
+    "CLANG_WARN_UNGUARDED_AVAILABILITY": "YES_AGGRESSIVE",
+    "CLANG_WARN_UNREACHABLE_CODE": "YES",
+    "CLANG_WARN__DUPLICATE_METHOD_MATCH": "YES",
+    "COPY_PHASE_STRIP": "NO",
+    "DEBUG_INFORMATION_FORMAT[config=Debug]": "dwarf",
+    "DEBUG_INFORMATION_FORMAT[config=Release]": "dwarf-with-dsym",
+    "ENABLE_NS_ASSERTIONS[config=Release]": "NO",
+    "ENABLE_STRICT_OBJC_MSGSEND": "YES",
+    "ENABLE_TESTABILITY[config=Debug]": "YES",
+    "ENABLE_USER_SCRIPT_SANDBOXING": "YES",
+    "GCC_C_LANGUAGE_STANDARD": "gnu17",
+    "GCC_DYNAMIC_NO_PIC[config=Debug]": "NO",
+    "GCC_NO_COMMON_BLOCKS": "YES",
+    "GCC_OPTIMIZATION_LEVEL[config=Debug]": "0",
+    "GCC_PREPROCESSOR_DEFINITIONS[config=Debug]": [
+      "DEBUG=1",
+      "$(inherited)"
+    ],
+    "GCC_WARN_64_TO_32_BIT_CONVERSION": "YES",
+    "GCC_WARN_ABOUT_RETURN_TYPE": "YES_ERROR",
+    "GCC_WARN_UNDECLARED_SELECTOR": "YES",
+    "GCC_WARN_UNINITIALIZED_AUTOS": "YES_AGGRESSIVE",
+    "GCC_WARN_UNUSED_FUNCTION": "YES",
+    "GCC_WARN_UNUSED_VARIABLE": "YES",
+    "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+    "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES",
+    "MTL_ENABLE_DEBUG_INFO[config=Debug]": "INCLUDE_SOURCE",
+    "MTL_ENABLE_DEBUG_INFO[config=Release]": "NO",
+    "MTL_FAST_MATH": "YES",
+    "ONLY_ACTIVE_ARCH[config=Debug]": "YES",
+    "SDKROOT": "iphoneos",
+    "SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Debug]": "DEBUG $(inherited)",
+    "SWIFT_COMPILATION_MODE[config=Release]": "wholemodule",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
+    "VALIDATE_PRODUCT[config=Release]": "YES"
+  },
+  "last-upgrade": "27.2",
+  "last-swift-update": "27.2"
+}
