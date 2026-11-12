@@ -7,6 +7,7 @@ function room(initial: Record<string, State> = {}) {
   let now = 1_000_000;
   let stored = initial;
   let writes = 0;
+  let policy: { key: string; mode: string; label: string } | null = { key: "youtube", mode: "timed", label: "YouTube" };
   const listeners: Array<(changes: object, area: string) => void> = [];
   const session = createSessionController({
     get: async () => structuredClone(stored),
@@ -34,14 +35,14 @@ function room(initial: Record<string, State> = {}) {
         tabs: { getCurrent: async () => ({ id }) }, storage: { onChanged: { addListener: (fn: typeof listeners[number]) => listeners.push(fn) } },
         runtime: { getURL: (path: string) => path, sendMessage: async (message: { action: string }) => {
           requests++;
-          return { policy: { key: "youtube", mode: "timed", label: "YouTube" }, state: await session.request("youtube", message.action, id, true) };
+          return { policy, state: await session.request("youtube", message.action, id, true) };
         } }
       }
     });
     return { events, elements, redirects, body, tick: () => timer(), requests: () => requests };
   }
   const settle = async () => { for (let i = 0; i < 200; i++) await Promise.resolve(); };
-  return { session, createGate, settle, advance: (ms: number) => { now += ms; }, writes: () => writes };
+  return { session, createGate, settle, advance: (ms: number) => { now += ms; }, writes: () => writes, removePolicy: () => { policy = null; listeners.forEach(listener => listener({ customSites: {} }, "local")); } };
 }
 test("an access screen recovers after another tab resets the session", async () => {
   const f = room({ youtube: { readyAt: 0, expiresAt: 0, cycle: 1, tabs: [1, 2], gateTabs: [1, 2] } });
@@ -72,4 +73,16 @@ test("two live access screens settle without repeated writes or automatic naviga
   a.events.get("continue")?.(); await f.settle();
   expect(a.redirects).toEqual(["https://www.youtube.com/"]);
   expect(f.writes() - before).toBeLessThan(5);
+});
+
+test("removing a rule leaves its waiting access screen on an explicit choice", async () => {
+  const f = room();
+  const gate = await f.createGate(1); await f.settle();
+  f.removePolicy(); await f.settle();
+  expect(gate.redirects).toEqual([]);
+  expect(gate.body.dataset.phase).toBe("choice");
+  expect(gate.elements.get("heading")?.textContent).toBe("This site is unblocked.");
+  expect(gate.elements.get("emergency")?.hidden).toBe(true);
+  gate.events.get("continue")?.(); await f.settle();
+  expect(gate.redirects).toEqual(["https://www.youtube.com/"]);
 });

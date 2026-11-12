@@ -61,7 +61,19 @@ async function act(action) {
   try {
     const response = await send(action);
     if (action === "close") { leaving = true; return; }
-    if (!response.policy) { leaving = true; location.replace(url); return; }
+    if (!response.policy) {
+      if (action === "open") { leaving = true; location.replace(url); return; }
+      clearTimeout(timer);
+      document.body.dataset.phase = "choice";
+      site.textContent = new URL(url).hostname;
+      eyebrow.textContent = "Rule removed";
+      heading.textContent = "This site is unblocked.";
+      detail.textContent = "You can open it without a time limit.";
+      proceed.textContent = "Continue to site";
+      proceed.hidden = false;
+      emergency.hidden = true;
+      return;
+    }
     if (response.policy.mode === "block") { leaving = true; location.replace(browser.runtime.getURL("blocked.html")); return; }
     label = response.policy.label;
     site.textContent = label;
