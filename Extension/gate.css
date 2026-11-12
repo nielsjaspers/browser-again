@@ -4,7 +4,12 @@ button { border-radius: .35rem; overflow-wrap: anywhere; }
 [hidden], #detail:empty, #error:empty { display: none !important; }
 #error { font-size: .9rem; }
 
-.breath { display: none; width: 6rem; height: 6rem; margin: 1.5rem 0; place-items: center; }
+body { isolation: isolate; background: #f5f3ed; }
+main { text-align: center; }
+.actions { margin-inline: auto; }
+body[data-phase="breathing"] #close { background: #222822; border-color: #222822; color: #f5f3ed; }
+.breath { display: none; position: fixed; inset: 0; z-index: 1; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; overflow: hidden; pointer-events: none; mix-blend-mode: difference; }
 body[data-phase="breathing"] .breath { display: grid; }
-#orb { width: 100%; height: 100%; border-radius: 50%; background: currentColor; opacity: .65; transform: scale(.45); }
-@media (prefers-reduced-motion: reduce) { #orb { transform: scale(.7) !important; } }
+#orb { width: min(120vmin, 42rem); aspect-ratio: 1; border-radius: 50%; background: white; transform: scale(.08); }
+@media (prefers-color-scheme: dark) { body { background: #171c18; } }
+@media (prefers-reduced-motion: reduce) { #orb { transform: scale(.35) !important; } }

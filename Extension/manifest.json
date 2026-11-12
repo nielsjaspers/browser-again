@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Browser Again",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Block distracting sites. Open YouTube with a timed five-minute pass.",
   "permissions": [
     "declarativeNetRequestWithHostAccess",
