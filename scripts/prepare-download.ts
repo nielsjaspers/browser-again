@@ -14,7 +14,7 @@ await Bun.write(resolve(out, "manifest.plist"), `<?xml version="1.0" encoding="U
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict><key>items</key><array><dict>
 <key>assets</key><array><dict><key>kind</key><string>software-package</string><key>url</key><string>${xml(new URL("BrowserAgain.ipa", base).href)}</string></dict></array>
-<key>metadata</key><dict><key>bundle-identifier</key><string>org.browseragain.app</string><key>bundle-version</key><string>1.6</string><key>kind</key><string>software</string><key>title</key><string>Browser Again</string></dict>
+<key>metadata</key><dict><key>bundle-identifier</key><string>org.browseragain.app</string><key>bundle-version</key><string>1.7</string><key>kind</key><string>software</string><key>title</key><string>Browser Again</string></dict>
 </dict></array></dict></plist>`);
 const installURL = `itms-services://?action=download-manifest&url=${encodeURIComponent(new URL("manifest.plist", base).href)}`;
 await Bun.write(resolve(out, "index.html"), `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Install Browser Again</title><style>
@@ -25,6 +25,6 @@ await Bun.write(resolve(out, "index.html"), `<!doctype html><html lang="en"><hea
 <li>Tap Install on iPhone. Confirm, then find Browser Again on the Home Screen.</li>
 <li>Open Settings &gt; Apps &gt; Safari &gt; Extensions &gt; Browser Again Extension. Turn it on and set All Websites to Allow.</li>
 <li>Enable it for each Safari profile and allow Private Browsing if you use private tabs.</li></ol>
-<p>Unknown Nitter instances are detected on your device as their pages load. Modified forks can evade detection. No browsing data is collected or sent.</p>
+<p>Unknown Nitter instances are detected on your device as their pages load. Modified forks can evade detection. Opening counts stay on this device. No browsing data is sent.</p>
 <p>Development signing expires with its provisioning profile. If iOS rejects this install, an ad hoc build needs Xcode signed in to the Apple Developer account. <a href="BrowserAgain.ipa">Download IPA</a>.</p></body></html>`);
 console.log(base.href);

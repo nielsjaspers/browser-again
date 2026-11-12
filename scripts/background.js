@@ -5,8 +5,8 @@ import { findPolicy, hostnameFromURL } from "./policy.js";
 const gateURL = browser.runtime.getURL("gate.html");
 const sitesURL = browser.runtime.getURL("sites.html");
 const session = createSessionController({
-  async get() { return (await browser.storage.local.get("siteSessions")).siteSessions; },
-  async set(value) { await browser.storage.local.set({ siteSessions: value }); }
+  async get() { return browser.storage.local.get(["siteSessions", "siteOpenings", "siteCooldowns"]); },
+  async set(value) { await browser.storage.local.set(value); }
 });
 const gateFor = url => `${gateURL}#${encodeURIComponent(url)}`;
 const isPage = (sender, url) => sender.url?.split(/[?#]/)[0] === url;

@@ -8,7 +8,7 @@ test("only the gate can grant access or close a tab; ordinary pages can read sta
   const tabs=[{id:1,url:"safari-web-extension://test/gate.html#video"}];
   runInNewContext(source,{URL,Date,browser:{
     runtime:{getURL:(path:string)=>`safari-web-extension://test/${path}`,onMessage:{addListener:(fn:typeof listeners[number])=>listeners.push(fn)},onInstalled:{addListener:()=>{}},onStartup:{addListener:()=>{}}},
-    storage:{local:{get:async(key:string)=>({[key]:store[key]}),set:async(data:object)=>Object.assign(store,structuredClone(data)),remove:async()=>{}}},
+    storage:{local:{get:async(key:string|string[])=>Object.fromEntries((Array.isArray(key)?key:[key]).map(k=>[k,structuredClone(store[k])])),set:async(data:object)=>Object.assign(store,structuredClone(data)),remove:async()=>{}}},
     alarms:{create:async()=>{},onAlarm:{addListener:()=>{}}},
     tabs:{query:async()=>tabs,get:async(id:number)=>tabs.find(tab=>tab.id===id),remove:async(id:number)=>{removed.push(id);},update:async()=>{},onRemoved:{addListener:()=>{}},onUpdated:{addListener:()=>{}}},
     declarativeNetRequest:{getDynamicRules:async()=>[],updateDynamicRules:async()=>{}}
@@ -35,7 +35,7 @@ test("moving between site access screens removes the old tab association", async
   const tabs = [{ id: 1, url: gate + "#https%3A%2F%2Fa.example.org%2F" }, { id: 2, url: gate + "#https%3A%2F%2Fa.example.org%2F" }];
   runInNewContext(source, { URL, Date: { now: () => time }, browser: {
     runtime: { getURL: (path: string) => `safari-web-extension://test/${path}`, onMessage: { addListener: (fn: typeof listeners[number]) => listeners.push(fn) }, onInstalled: { addListener: () => {} }, onStartup: { addListener: () => {} } },
-    storage: { local: { get: async (key: string) => ({ [key]: structuredClone(store[key]) }), set: async (data: object) => Object.assign(store, structuredClone(data)), remove: async () => {} } },
+    storage: { local: { get: async (key: string|string[]) => Object.fromEntries((Array.isArray(key)?key:[key]).map(k=>[k,structuredClone(store[k])])), set: async (data: object) => Object.assign(store, structuredClone(data)), remove: async () => {} } },
     alarms: { create: async () => {}, onAlarm: { addListener: () => {} } },
     declarativeNetRequest: { getDynamicRules: async () => [], updateDynamicRules: async () => {} },
     tabs: { get: async (id: number) => tabs.find(tab => tab.id === id), query: async () => tabs, update: async () => {}, remove: async () => {}, onUpdated: { addListener: (fn: typeof updated) => { updated = fn; } }, onRemoved: { addListener: (fn: typeof removed) => { removed = fn; } } }
@@ -50,4 +50,12 @@ test("moving between site access screens removes the old tab association", async
   await removed(1);
   expect((await send("status", 2)).state.expiresAt).toBe(activeA.state.expiresAt);
   expect(activeA.state.expiresAt).toBeGreaterThan(time);
+  time = activeA.state.expiresAt;
+  const emergency = await send("emergency", 2);
+  expect(emergency.state.expiresAt).toBe(time + 15 * 60_000);
+  expect(store.siteOpenings).toEqual({ "a.example.org": [time - 5 * 60_000, time] });
+  expect(store.siteCooldowns).toEqual({ "a.example.org": time + 75 * 60_000 });
+  await send("close", 2);
+  expect(store.siteOpenings).toEqual({ "a.example.org": [time - 5 * 60_000, time] });
+  expect(store.siteCooldowns).toEqual({ "a.example.org": time + 75 * 60_000 });
 });
