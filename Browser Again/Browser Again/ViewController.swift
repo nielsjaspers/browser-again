@@ -11,6 +11,9 @@ struct SetupView: View {
                 } header: {
                     Text("Blocked sites")
                 }
+                Section("Custom sites") {
+                    Text("In Safari, open the page menu, then Browser Again to add or remove your own blocked sites.")
+                }
                 Section {
                     Text("1. Open Settings > Apps > Safari > Extensions.")
                     Text("2. Turn on Browser Again Extension.")

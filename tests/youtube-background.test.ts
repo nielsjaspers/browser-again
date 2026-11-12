@@ -14,7 +14,7 @@ test("background grants only from the prompt and expiry redirects only YouTube t
   runInNewContext(source, {
     Date: { now: () => time }, URL,
     browser: {
-      runtime: { getURL: () => gateURL, onMessage: { addListener: (handler: typeof message) => { message = handler; } } },
+      runtime: { getURL: (path: string) => `safari-web-extension://test/${path}`, onMessage: { addListener: (handler: typeof message) => { const previous = message; message = (data, sender) => handler(data, sender) ?? previous(data, sender); } }, onInstalled: { addListener: () => {} }, onStartup: { addListener: () => {} } },
       storage: { local: {
         get: async () => ({ youtubeSession: state }),
         set: async (data: { youtubeSession: NonNullable<typeof state> }) => { state = data.youtubeSession; }

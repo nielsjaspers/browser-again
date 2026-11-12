@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Browser Again",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Block distracting sites. Open YouTube with a timed five-minute pass.",
   "permissions": [
     "declarativeNetRequestWithHostAccess",
@@ -53,7 +53,8 @@
       "resources": [
         "blocked.html",
         "blocked.css",
-        "youtube.html"
+        "youtube.html",
+        "sites.html"
       ],
       "matches": [
         "*://*/*"
@@ -65,5 +66,9 @@
       "background.js"
     ],
     "persistent": false
+  },
+  "action": {
+    "default_title": "Browser Again",
+    "default_popup": "sites.html"
   }
 }

@@ -12,6 +12,12 @@ Opening YouTube shows a confirmation page. Yes starts a ten-second countdown, th
 
 The extension stores the deadline locally. Content scripts hide YouTube until access is checked and pause media and return to the prompt at expiration. A background alarm also redirects open YouTube tabs. iOS can suspend background tabs and extension workers; suspended tabs enforce the deadline when they resume. YouTube embeds use the same pass.
 
+## Custom sites
+
+In Safari, open the page menu and choose Browser Again. Under Your sites, enter a domain or paste an HTTP or HTTPS URL, then tap Add. Subdomains are included. Remove deletes only your custom entry. The built-in sites and YouTube pass rules stay in place.
+
+Your list is saved on this device in the Safari extension profile. New entries also close matching open tabs. You can reach the same controls through Manage sites on a blocked page.
+
 ## Build
 
 Open `Browser Again/Browser Again.xcodeproj` with Xcode 27.2 or later. Select your signing team for both targets, then run on an iPhone or simulator. The project uses Xcode's current project format.

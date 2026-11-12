@@ -1,3 +1,4 @@
+import { CUSTOM_RULE_IDS, createCustomSitesController } from "./custom-sites.js";
 import { createSessionController } from "../Extension/session.js";
 
 const session = createSessionController({
@@ -34,3 +35,27 @@ browser.alarms.onAlarm.addListener(async alarm => {
     browser.tabs.update(tab.id, { url: `${gateURL}#${encodeURIComponent(tab.url)}` })
   ));
 });
+
+const sitesURL = browser.runtime.getURL("sites.html");
+const customSites = createCustomSitesController({
+  async get() { return (await browser.storage.local.get("customSites")).customSites; },
+  async set(hosts) { await browser.storage.local.set({ customSites: hosts }); }
+}, addRules => browser.declarativeNetRequest.updateDynamicRules({ removeRuleIds: CUSTOM_RULE_IDS, addRules }), async hosts => {
+  const tabs = await browser.tabs.query({});
+  const matches = url => {
+    try {
+      const parsed = new URL(url);
+      return /^https?:$/.test(parsed.protocol) && hosts.some(host => parsed.hostname === host || parsed.hostname.endsWith(`.${host}`));
+    } catch { return false; }
+  };
+  await Promise.allSettled(tabs.filter(tab => tab.id !== undefined && matches(tab.url)).map(tab => browser.tabs.update(tab.id, { url: browser.runtime.getURL("blocked.html") })));
+});
+
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (message?.type !== "custom-sites" || sender.url?.split(/[?#]/)[0] !== sitesURL) return;
+  if (!["list", "add", "remove"].includes(message.action)) return;
+  return customSites.request(message.action, message.site)
+    .then(sites => ({ sites }), error => ({ error: error.message || "Could not save your sites." }));
+});
+browser.runtime.onInstalled.addListener(() => customSites.request("restore"));
+browser.runtime.onStartup.addListener(() => customSites.request("restore"));
