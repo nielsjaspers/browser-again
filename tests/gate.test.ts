@@ -23,6 +23,12 @@ function room(initial: Record<string, State> = {}) {
     for (const name of ["heading", "detail", "close", "continue", "emergency", "error", "retry"]) {
       elements.set(name, { textContent: "", hidden: false, disabled: false, addEventListener: (_event, fn) => events.set(name, fn) });
     }
+    const animations: { currentTime: number; cancelled: boolean; cancel: () => void }[] = [];
+    const orb = { animate: () => {
+      const animation = { currentTime: 0, cancelled: false, cancel() { this.cancelled = true; } };
+      animations.push(animation);
+      return animation;
+    } };
     let timer = () => {};
     const redirects: string[] = [];
     const body = { dataset: { phase: "loading" }, style: { setProperty: () => {} } };
@@ -30,7 +36,7 @@ function room(initial: Record<string, State> = {}) {
     await runInNewContext(`(async()=>{${source}\n})()`, {
       URL, Date: { now: () => now }, setTimeout: (fn: () => void) => { timer = fn; return 1; }, clearTimeout: () => {},
       location: { hash: "#https%3A%2F%2Fwww.youtube.com%2F", replace: (url: string) => redirects.push(url) },
-      document: { querySelector: (selector: string) => elements.get(selector.slice(1)), body, title: "" },
+      document: { querySelector: (selector: string) => selector === "#orb" ? orb : elements.get(selector.slice(1)), body, title: "" },
       browser: {
         tabs: { getCurrent: async () => ({ id }) }, storage: { onChanged: { addListener: (fn: typeof listeners[number]) => listeners.push(fn) } },
         runtime: { getURL: (path: string) => path, sendMessage: async (message: { action: string }) => {
@@ -39,24 +45,27 @@ function room(initial: Record<string, State> = {}) {
         } }
       }
     });
-    return { events, elements, redirects, body, tick: () => timer(), requests: () => requests };
+    return { events, elements, redirects, body, animations, tick: () => timer(), requests: () => requests };
   }
   const settle = async () => { for (let i = 0; i < 200; i++) await Promise.resolve(); };
   return { session, createGate, settle, advance: (ms: number) => { now += ms; }, writes: () => writes, removePolicy: () => { policy = null; listeners.forEach(listener => listener({ customSites: {} }, "local")); } };
 }
-test("a static breath prompt waits seven seconds before offering an explicit choice", async () => {
+test("the breath prompt waits seven seconds before offering an explicit choice", async () => {
   const f = room();
   const gate = await f.createGate(1); await f.settle();
   expect(gate.elements.get("heading")?.textContent).toBe("Take a slow breath.");
   expect(gate.elements.get("continue")?.hidden).toBe(true);
   expect(gate.elements.get("emergency")?.hidden).toBe(true);
+  expect(gate.animations).toHaveLength(1);
   f.advance(6_999); gate.tick();
+  expect(gate.animations).toHaveLength(1);
   expect(gate.elements.get("heading")?.textContent).toBe("Take a slow breath.");
   expect(gate.elements.get("continue")?.hidden).toBe(true);
   f.advance(1); gate.tick();
   expect(gate.elements.get("heading")?.textContent).toBe("Open YouTube?");
   expect(gate.elements.get("continue")?.hidden).toBe(false);
   expect(gate.redirects).toEqual([]);
+  expect(gate.animations[0].cancelled).toBe(true);
 });
 test("an access screen recovers after another tab resets the session", async () => {
   const f = room({ youtube: { readyAt: 0, expiresAt: 0, cycle: 1, tabs: [1, 2], gateTabs: [1, 2] } });
@@ -99,4 +108,14 @@ test("removing a rule leaves its waiting access screen on an explicit choice", a
   expect(gate.elements.get("emergency")?.hidden).toBe(true);
   gate.events.get("continue")?.(); await f.settle();
   expect(gate.redirects).toEqual(["https://www.youtube.com/"]);
+});
+
+test("a new tab joins the existing breath without restarting its visual cycle", async () => {
+  const f = room();
+  const a = await f.createGate(1); await f.settle();
+  f.advance(4_000);
+  const b = await f.createGate(2); await f.settle();
+  expect(a.animations).toHaveLength(1);
+  expect(b.animations).toHaveLength(1);
+  expect(b.animations[0].currentTime).toBe(4_000);
 });
