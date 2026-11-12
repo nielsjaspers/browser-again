@@ -1,15 +1,17 @@
 body { display: block; min-width: 280px; }
 main { width: auto; max-width: 32rem; margin: 0 auto; padding: 1.5rem; }
-h1 { font-size: 2rem; margin: 0 0 1.75rem; }
-h2 { font-size: 1.15rem; margin: 0 0 1rem; }
+h1 { font-size: 2rem; margin: 0 0 1.5rem; }
+h2 { font-size: 1.15rem; margin: 1.5rem 0 .5rem; }
 section + section { margin-top: 2rem; }
 label { display: block; font-size: .9rem; margin-bottom: .5rem; }
-.add-row { display: flex; gap: .5rem; }
-input { min-width: 0; width: 100%; font: inherit; background: transparent; color: inherit; padding: .75rem; border: 1px solid #85907f; border-radius: .5rem; }
-.add-row button { padding: .75rem 1rem; }
-#status { font-size: .9rem; }
+input[type="text"], select { box-sizing: border-box; width: 100%; font: inherit; background: transparent; color: inherit; padding: .75rem; border: 1px solid #85907f; border-radius: .5rem; min-height: 48px; }
+.check { display: flex; align-items: center; gap: .65rem; margin: .6rem 0; min-height: 44px; }
+.check input { width: 20px; height: 20px; accent-color: #304e34; }
+#add { width: 100%; margin-top: 1rem; }
+#status { font-size: .9rem; line-height: 1.4; }
 ul { list-style: none; padding: 0; margin: 0; }
 li { display: flex; align-items: center; gap: 1rem; justify-content: space-between; padding: .85rem 0; border-bottom: 1px solid #85907f55; overflow-wrap: anywhere; }
+li small { display: block; line-height: 1.4; font-size: .75rem; opacity: .7; margin-top: .2rem; }
 li button { flex-shrink: 0; padding: .5rem .75rem; min-height: 44px; font-size: .9rem; }
 .built-in li { font-size: .95rem; }
-.built-in span { opacity: .65; font-size: .8rem; }
+.built-in span { opacity: .65; font-size: .8rem; text-align: right; }

@@ -6,23 +6,27 @@ Known hosts other than YouTube and their subdomains are blocked with Safari's de
 
 New Nitter domains are detected from their hostname or standard Nitter page metadata and markup. Detection runs locally and requires Safari permission for all websites. Unknown domains load far enough to expose that markup. Modified forks can evade detection. There is no analytics, browsing history storage, or remote reporting.
 
-## YouTube passes
+## Timed access
 
-Opening YouTube shows a confirmation page. Yes starts a ten-second countdown, then opens the original URL for five minutes. Emergency skips the countdown and grants the same five minutes. All YouTube tabs in the Safari extension profile share one deadline. Refreshing, opening another tab, and pressing Emergency during an active pass do not extend it.
+YouTube and custom sites set to timed access start with a ten-second breathing animation. After breathing, choose Continue for five minutes of access, or Close this tab to leave. The extension does not automatically open the site when the animation ends.
 
-The extension stores the deadline locally. Content scripts hide YouTube until access is checked and pause media and return to the prompt at expiration. A background alarm also redirects open YouTube tabs. iOS can suspend background tabs and extension workers; suspended tabs enforce the deadline when they resume. YouTube embeds use the same pass.
+When the five minutes expire, the access screen returns. Emergency appears only after the first completed access cycle and grants five more minutes without repeating the breathing exercise. It does not extend a currently active pass. Closing the access screen ends that site’s session. Closing all associated tabs, or navigating those tabs away from the site, also requires a fresh breathing cycle next time. Each site has its own session; tabs for the same site share one deadline.
+
+The extension stores current session deadlines and associated tab IDs locally. It does not store browsing history or access statistics. Content scripts pause media and return to the access screen at expiration. iOS can suspend tabs and extension workers; suspended tabs check their deadlines when they resume.
 
 ## Custom sites
 
-In Safari, open the page menu and choose Browser Again. Under Your sites, enter a domain or paste an HTTP or HTTPS URL, then tap Add. Subdomains are included. Remove deletes only your custom entry. The built-in sites and YouTube pass rules stay in place.
+In Safari, open the page menu and choose Browser Again. The form fills in the current site. You can also enter another domain or paste an HTTP or HTTPS URL. Choose whether to include all subdomains, then choose Always blocked or Breathe, then 5 minutes. Tap Block site to save.
 
-Your list is saved on this device in the Safari extension profile. New entries also close matching open tabs. You can reach the same controls through Manage sites on a blocked page.
+Unchecking subdomains blocks only the exact hostname shown. With subdomains enabled, a leading www is removed so the entry covers both the main domain and its subdomains. Adding a saved domain again updates its options. Remove deletes only your custom entry. Existing custom entries remain permanent blocks with subdomains included after an app update. More specific custom domains take precedence over broader custom rules. Built-in rules stay in place.
+
+Your list is stored on this device in the Safari extension profile. Saving a rule also applies it to matching open tabs. Manage sites on a permanently blocked page opens the same controls.
 
 ## Build
 
 Open `Browser Again/Browser Again.xcodeproj` with Xcode 27.2 or later. Select your signing team for both targets, then run on an iPhone or simulator. The project uses Xcode's current project format.
 
-Edit `Extension/hosts.json`, then run `bun scripts/build-extension.ts` to regenerate rules and bundle the background script. The background source is `scripts/background.js`; `Extension/background.js` is generated. Run `bun test` for the blocking, countdown, shared-pass, and expiration checks.
+Edit `Extension/hosts.json`, then run `bun scripts/build-extension.ts` to regenerate rules and bundle the background script. The background and page guard sources are in `scripts/background.js` and `scripts/guard.js`; their copies in `Extension` are generated. Run `bun test` for the blocking, countdown, shared-pass, and expiration checks.
 
 ## Install
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Browser Again",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Block distracting sites. Open YouTube with a timed five-minute pass.",
   "permissions": [
     "declarativeNetRequestWithHostAccess",
@@ -27,19 +27,17 @@
         "*://*/*"
       ],
       "js": [
-        "detect-nitter.js"
+        "detect-nitter.js",
+        "guard.js"
       ],
       "run_at": "document_start",
-      "all_frames": false
+      "all_frames": true
     },
     {
       "matches": [
         "*://*.youtube.com/*",
         "*://youtu.be/*",
         "*://*.youtube-nocookie.com/*"
-      ],
-      "js": [
-        "youtube-guard.js"
       ],
       "css": [
         "youtube-guard.css"
@@ -53,8 +51,8 @@
       "resources": [
         "blocked.html",
         "blocked.css",
-        "youtube.html",
-        "sites.html"
+        "sites.html",
+        "gate.html"
       ],
       "matches": [
         "*://*/*"
