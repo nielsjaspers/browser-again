@@ -117,7 +117,7 @@
   }
 
   // scripts/session.js
-  var BREATH_MS = 1e4;
+  var BREATH_MS = 7000;
   var PASS_MS = 5 * 60000;
   var fresh = () => ({ readyAt: 0, expiresAt: 0, cycle: 0, tabs: [], gateTabs: [] });
   function createSessionController(storage, now = Date.now) {

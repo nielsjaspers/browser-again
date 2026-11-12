@@ -1,4 +1,4 @@
-export const BREATH_MS = 10_000;
+export const BREATH_MS = 7_000;
 export const PASS_MS = 5 * 60_000;
 const fresh = () => ({ readyAt: 0, expiresAt: 0, cycle: 0, tabs: [], gateTabs: [] });
 
