@@ -21,10 +21,10 @@ struct SetupView: View {
                 } header: {
                     Text("Enable in Safari")
                 } footer: {
-                    Text("Access to all websites lets the extension recognize Nitter on unknown domains. Page detection runs on your device. No browsing data is collected or sent.")
+                    Text("Access to all websites lets the extension recognize Nitter on unknown domains. Page detection runs on your device. Opening counts stay on this device. No browsing data is sent.")
                 }
                 Section {
-                    Text("Take a breath, then choose whether to open YouTube for 5 minutes or close the tab. Emergency is available for later cycles in the same session. Other listed domains stay blocked. Standard Nitter instances on other domains are detected as the page loads. Modified forks can evade detection.")
+                    Text("Take a breath, then choose whether to open YouTube for 5 minutes or close the tab. Emergency grants 15 minutes after the first cycle, followed by a one-hour cooldown when that pass ends. Other listed domains stay blocked. Standard Nitter instances on other domains are detected as the page loads. Modified forks can evade detection.")
                     Text("Enable the extension for each Safari profile you use. Allow it in Private Browsing if you use private tabs.")
                 } footer: {
                     Text("This blocks websites in Safari. It does not block standalone apps or other browsers.")

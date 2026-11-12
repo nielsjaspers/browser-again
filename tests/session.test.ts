@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
-import { createSessionController, PASS_MS, BREATH_MS } from "../scripts/session.js";
+import { createSessionController, PASS_MS, BREATH_MS, DAY_MS, EMERGENCY_MS, COOLDOWN_MS } from "../scripts/session.js";
 
 type State = { readyAt: number; expiresAt: number; cycle: number; tabs: number[] };
 function fixture() {
   let time = 1_000_000;
-  let saved: Record<string, State> = {};
+  let saved = { siteSessions: {} as Record<string, State>, siteOpenings: {} as Record<string, number[]>, siteCooldowns: {} as Record<string, number> };
   let writes = 0;
-  const storage = { get: async () => structuredClone(saved), set: async (state: typeof saved) => { saved = structuredClone(state); writes++; } };
+  const storage = { get: async () => structuredClone(saved), set: async (state: Partial<typeof saved>) => { saved = { ...saved, ...structuredClone(state) }; writes++; } };
   return { session: createSessionController(storage, () => time), restart: () => createSessionController(storage, () => time), advance: (ms: number) => { time += ms; }, now: () => time, writes: () => writes };
 }
 test("first visit requires a full breath and an explicit continue", async () => {
@@ -30,7 +30,7 @@ test("Emergency renews an expired cycle, cannot extend an active pass, and stays
   expect((await f.session.request("youtube", "emergency", 2)).expiresAt).toBe(first.expiresAt);
   f.advance(PASS_MS);
   const renewed = await f.session.request("youtube", "emergency", 1);
-  expect(renewed.expiresAt).toBe(f.now() + PASS_MS);
+  expect(renewed.expiresAt).toBe(f.now() + EMERGENCY_MS);
   expect(renewed.cycle).toBe(2);
   await expect(f.session.request("linkedin.com", "emergency", 3)).rejects.toThrow();
 });
@@ -81,4 +81,56 @@ test("closing an expired access-screen tab resets the site even when another tab
   await f.session.removeTab(1);
   expect((await f.session.request("youtube", "status", 2, true)).cycle).toBe(0);
   await expect(f.session.request("youtube", "emergency", 2, true)).rejects.toThrow();
+});
+
+test("opening counts survive session resets, isolate sites, and expire after 24 hours", async () => {
+  const f = fixture();
+  expect((await f.session.request("youtube", "begin", 1)).opens24h).toBe(0);
+  expect((await f.session.request("youtube", "open", 1)).opens24h).toBe(0);
+  f.advance(BREATH_MS);
+  const [a, b] = await Promise.all([f.session.request("youtube", "open", 1), f.session.request("youtube", "open", 2)]);
+  expect(a.opens24h).toBe(1); expect(b.opens24h).toBe(1);
+  expect((await f.restart().request("youtube", "status", 3)).opens24h).toBe(1);
+  f.advance(PASS_MS);
+  expect((await f.session.request("youtube", "emergency", 1)).opens24h).toBe(2);
+  expect((await f.session.request("youtube", "emergency", 2)).opens24h).toBe(2);
+  expect((await f.session.request("linkedin.com", "begin", 4)).opens24h).toBe(0);
+  expect((await f.session.request("youtube", "close", 1)).opens24h).toBe(2);
+  expect((await f.session.request("youtube", "begin", 1)).cycle).toBe(0);
+  await f.session.removeTab(1);
+  expect((await f.restart().request("youtube", "status", 5)).opens24h).toBe(2);
+  f.advance(DAY_MS - PASS_MS);
+  expect((await f.session.request("youtube", "status", 5)).opens24h).toBe(1);
+  f.advance(PASS_MS);
+  expect((await f.session.request("youtube", "status", 5)).opens24h).toBe(0);
+  const writes = f.writes();
+  await f.session.request("youtube", "status", 5);
+  expect(f.writes()).toBe(writes);
+});
+
+test("Emergency lasts fifteen minutes and its following hour survives session resets", async () => {
+  const f = fixture();
+  await f.session.request("youtube", "begin", 1); f.advance(BREATH_MS);
+  await f.session.request("youtube", "open", 1); f.advance(PASS_MS);
+  const emergency = await f.session.request("youtube", "emergency", 1);
+  expect(emergency.expiresAt).toBe(f.now() + EMERGENCY_MS);
+  expect(emergency.emergencyReadyAt).toBe(emergency.expiresAt + COOLDOWN_MS);
+  f.advance(EMERGENCY_MS);
+  expect((await f.session.request("youtube", "begin", 1)).readyAt).toBe(f.now() + BREATH_MS);
+  await expect(f.session.request("youtube", "emergency", 1)).rejects.toThrow("one-hour cooldown");
+  f.advance(BREATH_MS);
+  const normal = await f.session.request("youtube", "open", 1);
+  expect(normal.expiresAt).toBe(f.now() + PASS_MS);
+  expect(normal.emergencyReadyAt).toBe(emergency.emergencyReadyAt);
+  await f.session.request("youtube", "close", 1);
+  await f.restart().request("youtube", "begin", 2); f.advance(BREATH_MS);
+  await f.session.request("youtube", "open", 2); f.advance(PASS_MS);
+  await expect(f.restart().request("youtube", "emergency", 2)).rejects.toThrow("one-hour cooldown");
+  f.advance(emergency.emergencyReadyAt - f.now() - 1);
+  await expect(f.session.request("youtube", "emergency", 2)).rejects.toThrow("one-hour cooldown");
+  f.advance(1);
+  expect((await f.session.request("youtube", "emergency", 2)).expiresAt).toBe(f.now() + EMERGENCY_MS);
+  await f.session.request("linkedin.com", "begin", 3); f.advance(BREATH_MS);
+  await f.session.request("linkedin.com", "open", 3); f.advance(PASS_MS);
+  expect((await f.session.request("linkedin.com", "emergency", 3)).expiresAt).toBe(f.now() + EMERGENCY_MS);
 });

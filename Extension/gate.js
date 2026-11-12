@@ -1,4 +1,6 @@
 const heading = document.querySelector("#heading");
+const cooldown = document.querySelector("#cooldown");
+const usage = document.querySelector("#usage");
 const detail = document.querySelector("#detail");
 const close = document.querySelector("#close");
 const proceed = document.querySelector("#continue");
@@ -35,16 +37,23 @@ async function send(action) {
 function draw(state) {
   clearTimeout(timer);
   const activePass = state.expiresAt > Date.now();
-  emergency.hidden = state.cycle === 0 || activePass;
+  usage.textContent = `Opened ${state.opens24h} ${state.opens24h === 1 ? "time" : "times"} in the last 24 hours.`;
+  usage.hidden = false;
+  const cooldownLeft = state.emergencyReadyAt - Date.now();
+  const cooldownMinutes = Math.ceil(cooldownLeft / 60_000);
+  emergency.hidden = state.cycle === 0 || activePass || cooldownLeft > 0;
+  cooldown.hidden = cooldownLeft <= 0 || activePass;
+  cooldown.textContent = cooldownLeft > 0 ? `Emergency available in ${cooldownMinutes} ${cooldownMinutes === 1 ? "minute" : "minutes"}.` : "";
   proceed.hidden = true;
   const remaining = activePass ? 0 : state.readyAt - Date.now();
   if (remaining <= 0) {
     stopBreathing();
     document.body.dataset.phase = "choice";
     heading.textContent = `Open ${label}?`;
-    detail.textContent = activePass ? "Continue within your current session. Its deadline stays the same." : "You’ll have 5 minutes.";
-    proceed.textContent = "Continue for 5 minutes";
+    detail.textContent = activePass ? "Continue within your current session. Its deadline stays the same." : emergency.hidden ? "You’ll have 5 minutes." : "";
+    proceed.textContent = activePass ? "Continue to site" : "Continue for 5 minutes";
     proceed.hidden = false;
+    if (cooldownLeft > 0) timer = setTimeout(() => act("begin"), Math.min(60_000, cooldownLeft));
     return;
   }
   document.body.dataset.phase = "breathing";
@@ -76,6 +85,8 @@ async function act(action) {
       clearTimeout(timer);
       stopBreathing();
       document.body.dataset.phase = "choice";
+      usage.hidden = true;
+      cooldown.hidden = true;
       heading.textContent = "This site is unblocked.";
       detail.textContent = "You can open it without a time limit.";
       proceed.textContent = "Continue to site";
@@ -102,7 +113,7 @@ close.addEventListener("click", () => act("close"));
 proceed.addEventListener("click", () => act("open"));
 emergency.addEventListener("click", () => act("emergency"));
 browser.storage.onChanged.addListener((changes, area) => {
-  if (area !== "local" || leaving || (!changes.siteSessions && !changes.customSites)) return;
+  if (area !== "local" || leaving || (!changes.siteSessions && !changes.customSites && !changes.siteOpenings && !changes.siteCooldowns)) return;
   if (busy) refreshPending = true;
   else act("begin");
 });

@@ -11,11 +11,13 @@
 <body data-phase="loading"><main>
   <h1 id="heading" aria-live="polite" aria-atomic="true">Checking access…</h1>
   <p id="detail" role="status" aria-live="polite"></p>
+  <p id="usage" class="note" hidden></p>
+  <p id="cooldown" class="note" hidden></p>
   <div class="breath" aria-hidden="true"><div id="orb"></div></div>
   <div class="actions">
     <button id="close" type="button" disabled>Close this tab</button>
     <button id="continue" class="secondary" type="button" hidden>Continue for 5 minutes</button>
-    <button id="emergency" class="secondary" type="button" hidden>Emergency · 5 more minutes</button>
+    <button id="emergency" class="secondary" type="button" hidden>Emergency · 15 minutes</button>
     <button id="retry" class="secondary" type="button" hidden>Try again</button>
   </div>
   <p id="error" role="alert"></p>
