@@ -36,6 +36,7 @@ export function createSessionController(storage, now = Date.now) {
         if (action === "begin" && !state.readyAt) state.readyAt = time + BREATH_MS;
         if (action === "emergency" && state.cycle === 0) throw new Error("Complete your first breathing cycle before using Emergency.");
         if (action === "emergency" && cooldowns[key]) throw new Error("Emergency is unavailable during its one-hour cooldown.");
+        if (action === "emergency" && (!state.readyAt || time < state.readyAt)) throw new Error("Complete the breathing cycle before using Emergency.");
         if (action === "emergency" || (action === "open" && state.readyAt > 0 && time >= state.readyAt)) {
           state = { ...state, readyAt: 0, expiresAt: time + (action === "emergency" ? EMERGENCY_MS : PASS_MS), cycle: state.cycle + 1 };
           if (action === "emergency") cooldowns[key] = state.expiresAt + COOLDOWN_MS;
