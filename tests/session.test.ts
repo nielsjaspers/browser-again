@@ -29,6 +29,7 @@ test("Emergency renews an expired cycle, cannot extend an active pass, and stays
   f.advance(20_000);
   expect((await f.session.request("youtube", "emergency", 2)).expiresAt).toBe(first.expiresAt);
   f.advance(PASS_MS);
+  await f.session.request("youtube", "begin", 1); f.advance(BREATH_MS);
   const renewed = await f.session.request("youtube", "emergency", 1);
   expect(renewed.expiresAt).toBe(f.now() + EMERGENCY_MS);
   expect(renewed.cycle).toBe(2);
@@ -92,6 +93,7 @@ test("opening counts survive session resets, isolate sites, and expire after 24 
   expect(a.opens24h).toBe(1); expect(b.opens24h).toBe(1);
   expect((await f.restart().request("youtube", "status", 3)).opens24h).toBe(1);
   f.advance(PASS_MS);
+  await f.session.request("youtube", "begin", 1); f.advance(BREATH_MS);
   expect((await f.session.request("youtube", "emergency", 1)).opens24h).toBe(2);
   expect((await f.session.request("youtube", "emergency", 2)).opens24h).toBe(2);
   expect((await f.session.request("linkedin.com", "begin", 4)).opens24h).toBe(0);
@@ -99,9 +101,9 @@ test("opening counts survive session resets, isolate sites, and expire after 24 
   expect((await f.session.request("youtube", "begin", 1)).cycle).toBe(0);
   await f.session.removeTab(1);
   expect((await f.restart().request("youtube", "status", 5)).opens24h).toBe(2);
-  f.advance(DAY_MS - PASS_MS);
+  f.advance(DAY_MS - PASS_MS - BREATH_MS);
   expect((await f.session.request("youtube", "status", 5)).opens24h).toBe(1);
-  f.advance(PASS_MS);
+  f.advance(PASS_MS + BREATH_MS);
   expect((await f.session.request("youtube", "status", 5)).opens24h).toBe(0);
   const writes = f.writes();
   await f.session.request("youtube", "status", 5);
@@ -112,6 +114,7 @@ test("Emergency lasts fifteen minutes and its following hour survives session re
   const f = fixture();
   await f.session.request("youtube", "begin", 1); f.advance(BREATH_MS);
   await f.session.request("youtube", "open", 1); f.advance(PASS_MS);
+  await f.session.request("youtube", "begin", 1); f.advance(BREATH_MS);
   const emergency = await f.session.request("youtube", "emergency", 1);
   expect(emergency.expiresAt).toBe(f.now() + EMERGENCY_MS);
   expect(emergency.emergencyReadyAt).toBe(emergency.expiresAt + COOLDOWN_MS);
@@ -129,8 +132,22 @@ test("Emergency lasts fifteen minutes and its following hour survives session re
   f.advance(emergency.emergencyReadyAt - f.now() - 1);
   await expect(f.session.request("youtube", "emergency", 2)).rejects.toThrow("one-hour cooldown");
   f.advance(1);
+  await f.session.request("youtube", "begin", 1); f.advance(BREATH_MS);
   expect((await f.session.request("youtube", "emergency", 2)).expiresAt).toBe(f.now() + EMERGENCY_MS);
   await f.session.request("linkedin.com", "begin", 3); f.advance(BREATH_MS);
   await f.session.request("linkedin.com", "open", 3); f.advance(PASS_MS);
+  await f.session.request("linkedin.com", "begin", 3); f.advance(BREATH_MS);
   expect((await f.session.request("linkedin.com", "emergency", 3)).expiresAt).toBe(f.now() + EMERGENCY_MS);
+});
+
+test("Emergency cannot bypass a later breathing cycle", async () => {
+  const f = fixture();
+  await f.session.request("youtube", "begin", 1); f.advance(BREATH_MS);
+  await f.session.request("youtube", "open", 1); f.advance(PASS_MS);
+  await expect(f.session.request("youtube", "emergency", 1)).rejects.toThrow("breathing cycle");
+  await f.session.request("youtube", "begin", 1); f.advance(BREATH_MS - 1);
+  await expect(f.session.request("youtube", "emergency", 1)).rejects.toThrow("breathing cycle");
+  expect((await f.session.request("youtube", "status", 1)).opens24h).toBe(1);
+  f.advance(1);
+  expect((await f.session.request("youtube", "emergency", 1)).expiresAt).toBe(f.now() + EMERGENCY_MS);
 });

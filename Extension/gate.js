@@ -41,7 +41,7 @@ function draw(state) {
   usage.hidden = false;
   const cooldownLeft = state.emergencyReadyAt - Date.now();
   const cooldownMinutes = Math.ceil(cooldownLeft / 60_000);
-  emergency.hidden = state.cycle === 0 || activePass || cooldownLeft > 0;
+  emergency.hidden = state.cycle === 0 || activePass || cooldownLeft > 0 || state.readyAt > Date.now();
   cooldown.hidden = cooldownLeft <= 0 || activePass;
   cooldown.textContent = cooldownLeft > 0 ? `Emergency available in ${cooldownMinutes} ${cooldownMinutes === 1 ? "minute" : "minutes"}.` : "";
   proceed.hidden = true;

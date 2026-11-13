@@ -51,11 +51,13 @@ test("moving between site access screens removes the old tab association", async
   expect((await send("status", 2)).state.expiresAt).toBe(activeA.state.expiresAt);
   expect(activeA.state.expiresAt).toBeGreaterThan(time);
   time = activeA.state.expiresAt;
+  const breath = await send("begin", 2);
+  time = breath.state.readyAt;
   const emergency = await send("emergency", 2);
   expect(emergency.state.expiresAt).toBe(time + 15 * 60_000);
-  expect(store.siteOpenings).toEqual({ "a.example.org": [time - 5 * 60_000, time] });
+  expect(store.siteOpenings).toEqual({ "a.example.org": [activeA.state.expiresAt - 5 * 60_000, time] });
   expect(store.siteCooldowns).toEqual({ "a.example.org": time + 75 * 60_000 });
   await send("close", 2);
-  expect(store.siteOpenings).toEqual({ "a.example.org": [time - 5 * 60_000, time] });
+  expect(store.siteOpenings).toEqual({ "a.example.org": [activeA.state.expiresAt - 5 * 60_000, time] });
   expect(store.siteCooldowns).toEqual({ "a.example.org": time + 75 * 60_000 });
 });
